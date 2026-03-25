@@ -48,9 +48,9 @@ main {
   --color-attention-fg: #e8c86a;
   --color-danger-fg: #c47070;
 
-  --color-fg-default: #e8e4de;
-  --color-fg-muted: rgba(232, 228, 222, 0.6);
-  --color-fg-subtle: rgba(232, 228, 222, 0.4);
+  --color-fg-default: #ffffff;
+  --color-fg-muted: #e8e4de;
+  --color-fg-subtle: #e8e4de;
 
   --color-btn-text: #e8e4de;
   --color-btn-bg: #2d2d2d;
@@ -68,6 +68,7 @@ main {
 
   color: #e8e4de;
   font-family: 'Fraunces', serif;
+  font-weight: 700;
 }
 
 main .gsc-comment-box {
@@ -75,7 +76,19 @@ main .gsc-comment-box {
 }
 
 main .gsc-header {
-  padding-bottom: 0.5rem;
+  padding-bottom: 0;
+  margin-bottom: -0.5rem;
+}
+
+main .gsc-comments-count {
+  color: #e8e4de;
+  font-family: 'Fraunces', serif;
+  font-weight: 800;
+  font-size: 1rem;
+}
+
+main .gsc-main {
+  gap: 0.5rem;
 }
 
 main .gsc-comments > .gsc-comment {
