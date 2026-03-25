@@ -1,0 +1,323 @@
+---
+
+---
+
+<div class="calendar-overlay" id="calendar-overlay">
+  <div class="calendar-modal" id="calendar-modal">
+    <div class="calendar-content" id="calendar-content">
+    </div>
+  </div>
+</div>
+
+<style>
+  .calendar-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 200;
+    display: none;
+    align-items: flex-start;
+    justify-content: center;
+    padding-top: 5rem;
+  }
+
+  .calendar-overlay.visible {
+    display: flex;
+  }
+
+  .calendar-modal {
+    background-color: #2a2a2a;
+    border-radius: 6px;
+    width: 360px;
+    max-height: 70vh;
+    overflow-y: auto;
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.5);
+  }
+
+  .calendar-content {
+    padding: 1.5rem;
+  }
+
+  /* --- Year Picker with Arrows --- */
+  .calendar-content :global(.year-picker) {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.25rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .calendar-content :global(.year-arrow) {
+    background: none;
+    border: none;
+    color: var(--text-desk-muted);
+    cursor: pointer;
+    padding: 0.3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s ease;
+  }
+
+  .calendar-content :global(.year-arrow:hover:not(.disabled)) {
+    color: var(--text-desk-hover);
+  }
+
+  .calendar-content :global(.year-arrow.disabled) {
+    opacity: 0.2;
+    cursor: default;
+  }
+
+  .calendar-content :global(.year-label) {
+    font-family: 'Fraunces', serif;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--text-desk-hover);
+    min-width: 4rem;
+    text-align: center;
+  }
+
+  /* --- Month List --- */
+  .calendar-content :global(.month-list) {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .calendar-content :global(.month-btn) {
+    font-family: 'Fraunces', serif;
+    font-size: 0.9rem;
+    background: none;
+    border: none;
+    color: var(--text-desk);
+    opacity: 0.7;
+    cursor: pointer;
+    padding: 0.5rem 0.6rem;
+    border-radius: 3px;
+    text-align: left;
+    transition: opacity 0.2s ease, background-color 0.2s ease;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .calendar-content :global(.month-btn:hover) {
+    opacity: 1;
+    background-color: #353535;
+  }
+
+  .calendar-content :global(.month-count) {
+    font-size: 0.75rem;
+    opacity: 0.5;
+  }
+
+  /* --- Post List View --- */
+  .calendar-content :global(.back-btn) {
+    font-family: 'Fraunces', serif;
+    font-size: 0.85rem;
+    background: none;
+    border: none;
+    color: var(--text-desk-muted);
+    cursor: pointer;
+    padding: 0.3rem 0;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    transition: color 0.2s ease;
+  }
+
+  .calendar-content :global(.back-btn:hover) {
+    color: var(--text-desk-hover);
+  }
+
+  .calendar-content :global(.post-list-heading) {
+    font-family: 'Fraunces', serif;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text-desk-hover);
+    margin-bottom: 0.75rem;
+  }
+
+  .calendar-content :global(.calendar-post-link) {
+    display: block;
+    padding: 0.6rem;
+    color: var(--text-desk);
+    text-decoration: none;
+    font-family: 'Fraunces', serif;
+    font-size: 0.88rem;
+    line-height: 1.4;
+    border-radius: 3px;
+    transition: background-color 0.15s ease;
+    opacity: 0.8;
+  }
+
+  .calendar-content :global(.calendar-post-link:hover) {
+    background-color: #353535;
+    opacity: 1;
+  }
+
+  .calendar-content :global(.calendar-post-date) {
+    font-size: 0.7rem;
+    opacity: 0.5;
+    display: block;
+    margin-top: 0.1rem;
+  }
+
+  .calendar-content :global(.no-posts) {
+    color: var(--text-desk-muted);
+    font-family: 'Fraunces', serif;
+    font-size: 0.88rem;
+    padding: 0.5rem 0;
+  }
+
+  @media (max-width: 480px) {
+    .calendar-modal {
+      width: 90%;
+    }
+  }
+</style>
+
+<script>
+  type Post = { title: string; slug: string; date: string };
+
+  const MONTHS = [
+    'January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December'
+  ];
+
+  const ARROW_LEFT = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>`;
+  const ARROW_RIGHT = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>`;
+
+  let posts: Post[] = [];
+  let loaded = false;
+  let years: number[] = [];
+
+  const overlay = document.getElementById('calendar-overlay')!;
+  const content = document.getElementById('calendar-content')!;
+  const calendarToggle = document.querySelector('.calendar-toggle');
+
+  async function loadPosts() {
+    if (loaded) return;
+    const res = await fetch('/search-index.json');
+    posts = await res.json();
+    years = [...new Set(posts.map(p => new Date(p.date).getFullYear()))].sort((a, b) => b - a);
+    loaded = true;
+  }
+
+  function getMonthsForYear(year: number): { month: number; count: number }[] {
+    const monthMap = new Map<number, number>();
+    posts.forEach(p => {
+      const d = new Date(p.date);
+      if (d.getFullYear() === year) {
+        const m = d.getMonth();
+        monthMap.set(m, (monthMap.get(m) || 0) + 1);
+      }
+    });
+    return [...monthMap.entries()]
+      .map(([month, count]) => ({ month, count }))
+      .sort((a, b) => b.month - a.month);
+  }
+
+  function getPostsForMonth(year: number, month: number): Post[] {
+    return posts.filter(p => {
+      const d = new Date(p.date);
+      return d.getFullYear() === year && d.getMonth() === month;
+    }).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  }
+
+  function renderYearMonthView(selectedYear?: number) {
+    if (!selectedYear) selectedYear = years[0];
+    const yearIdx = years.indexOf(selectedYear);
+    const canGoNewer = yearIdx > 0;
+    const canGoOlder = yearIdx < years.length - 1;
+    const months = getMonthsForYear(selectedYear);
+
+    content.innerHTML = `
+      <div class="year-picker">
+        <button class="year-arrow ${canGoNewer ? '' : 'disabled'}" id="year-prev" ${!canGoNewer ? 'disabled' : ''}>
+          ${ARROW_LEFT}
+        </button>
+        <span class="year-label">${selectedYear}</span>
+        <button class="year-arrow ${canGoOlder ? '' : 'disabled'}" id="year-next" ${!canGoOlder ? 'disabled' : ''}>
+          ${ARROW_RIGHT}
+        </button>
+      </div>
+      <div class="month-list">
+        ${months.length > 0
+          ? months.map(m =>
+              `<button class="month-btn" data-year="${selectedYear}" data-month="${m.month}">
+                ${MONTHS[m.month]}
+                <span class="month-count">${m.count} post${m.count > 1 ? 's' : ''}</span>
+              </button>`
+            ).join('')
+          : '<div class="no-posts">No posts this year</div>'
+        }
+      </div>
+    `;
+
+    document.getElementById('year-prev')?.addEventListener('click', () => {
+      if (canGoNewer) renderYearMonthView(years[yearIdx - 1]);
+    });
+
+    document.getElementById('year-next')?.addEventListener('click', () => {
+      if (canGoOlder) renderYearMonthView(years[yearIdx + 1]);
+    });
+
+    content.querySelectorAll('.month-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const el = btn as HTMLElement;
+        renderPostList(Number(el.dataset.year), Number(el.dataset.month));
+      });
+    });
+  }
+
+  function renderPostList(year: number, month: number) {
+    const monthPosts = getPostsForMonth(year, month);
+
+    content.innerHTML = `
+      <button class="back-btn" id="back-btn">
+        ${ARROW_LEFT}
+        Back
+      </button>
+      <div class="post-list-heading">${MONTHS[month]} ${year}</div>
+      ${monthPosts.map(p =>
+        `<a class="calendar-post-link" href="/posts/${p.slug}">
+          ${p.title}
+          <span class="calendar-post-date">${p.date}</span>
+        </a>`
+      ).join('')}
+    `;
+
+    document.getElementById('back-btn')?.addEventListener('click', () => {
+      renderYearMonthView(year);
+    });
+  }
+
+  function openModal() {
+    overlay.classList.add('visible');
+    renderYearMonthView();
+  }
+
+  function closeModal() {
+    overlay.classList.remove('visible');
+  }
+
+  calendarToggle?.addEventListener('click', async () => {
+    await loadPosts();
+    openModal();
+  });
+
+  overlay.addEventListener('click', (e) => {
+    if (e.target === overlay) closeModal();
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && overlay.classList.contains('visible')) {
+      closeModal();
+    }
+  });
+</script>

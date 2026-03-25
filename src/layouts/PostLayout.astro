@@ -1,0 +1,45 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import AuthorCard from '../components/AuthorCard.astro';
+
+interface Props {
+  title: string;
+  date: Date;
+}
+
+const { title, date } = Astro.props;
+
+const formattedDate = date.toLocaleDateString('en-US', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+});
+---
+
+<BaseLayout title={title}>
+  <article>
+    <div class="paper">
+      <header class="post-header">
+        <time datetime={date.toISOString().split('T')[0]}>{formattedDate}</time>
+        <h1>{title}</h1>
+      </header>
+      <div class="post-content">
+        <slot />
+      </div>
+      <AuthorCard />
+    </div>
+  </article>
+</BaseLayout>
+
+<style>
+  .post-header {
+    margin-bottom: 2.5rem;
+  }
+
+  .post-header time {
+    font-size: 0.85rem;
+    opacity: 0.6;
+    display: block;
+    margin-bottom: 0.5rem;
+  }
+</style>

@@ -1,0 +1,32 @@
+---
+import Header from '../components/Header.astro';
+import CalendarModal from '../components/CalendarModal.astro';
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+}
+
+const { title } = Astro.props;
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,100..900;1,9..144,100..900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+    <title>{title} | Human Thoughts</title>
+    <!-- Umami Analytics -->
+    <script defer src="https://umami-production-5a92.up.railway.app/script.js" data-website-id="6e115319-869c-484f-8a1e-a7685846af39"></script>
+  </head>
+  <body>
+    <Header />
+    <CalendarModal />
+    <main>
+      <slot />
+    </main>
+  </body>
+</html>

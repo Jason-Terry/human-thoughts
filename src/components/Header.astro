@@ -1,0 +1,295 @@
+---
+
+---
+
+<header class="site-header">
+  <div class="header-left">
+    <button class="header-icon search-toggle" aria-label="Search posts">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="8"/>
+        <path d="m21 21-4.3-4.3"/>
+      </svg>
+    </button>
+    <div class="search-wrapper">
+      <input
+        type="text"
+        class="search-input"
+        placeholder="Search posts..."
+        aria-label="Search posts by title"
+        autocomplete="off"
+      />
+      <div class="search-results" aria-live="polite"></div>
+    </div>
+  </div>
+
+  <a href="/" class="site-name">Human Thoughts</a>
+
+  <div class="header-right">
+    <button class="header-icon calendar-toggle" aria-label="Browse by date">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect width="18" height="18" x="3" y="4" rx="2" ry="2"/>
+        <line x1="16" x2="16" y1="2" y2="6"/>
+        <line x1="8" x2="8" y1="2" y2="6"/>
+        <line x1="3" x2="21" y1="10" y2="10"/>
+      </svg>
+    </button>
+  </div>
+</header>
+
+<style>
+  .site-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.25rem 2rem;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background-color: var(--bg-desk);
+    border-bottom: 2px solid #2e2e2e;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+  }
+
+  .header-left,
+  .header-right {
+    display: flex;
+    align-items: center;
+    width: 200px;
+  }
+
+  .header-right {
+    justify-content: flex-end;
+  }
+
+  .site-name {
+    font-family: 'Fraunces', serif;
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: var(--text-desk-muted);
+    text-decoration: none;
+    transition: color 0.3s ease;
+    letter-spacing: 0.02em;
+  }
+
+  .site-name:hover {
+    color: var(--text-desk-hover);
+  }
+
+  .header-icon {
+    background: none;
+    border: none;
+    color: var(--text-desk-muted);
+    cursor: pointer;
+    padding: 0.4rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.3s ease;
+    flex-shrink: 0;
+  }
+
+  .header-icon:hover {
+    color: var(--text-desk-hover);
+  }
+
+  .search-wrapper {
+    position: relative;
+  }
+
+  .search-input {
+    font-family: 'Fraunces', serif;
+    font-size: 0.9rem;
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid var(--text-desk-muted);
+    color: var(--text-desk-hover);
+    padding: 0.25rem 0.5rem;
+    width: 0;
+    opacity: 0;
+    transition: width 0.3s ease, opacity 0.3s ease, margin 0.3s ease;
+    outline: none;
+    margin-left: 0;
+  }
+
+  .search-input::placeholder {
+    color: var(--text-desk-muted);
+  }
+
+  .search-input.expanded {
+    width: 200px;
+    opacity: 1;
+    margin-left: 0.5rem;
+  }
+
+  .search-results {
+    position: absolute;
+    top: calc(100% + 0.5rem);
+    left: 0.5rem;
+    width: 280px;
+    background-color: #2a2a2a;
+    border-radius: 4px;
+    overflow: hidden;
+    display: none;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  }
+
+  .search-results.visible {
+    display: block;
+  }
+
+  .search-results :global(a) {
+    display: block;
+    padding: 0.6rem 0.85rem;
+    color: var(--text-desk);
+    text-decoration: none;
+    font-family: 'Fraunces', serif;
+    font-size: 0.85rem;
+    line-height: 1.4;
+    transition: background-color 0.15s ease;
+    opacity: 0.8;
+  }
+
+  .search-results :global(a:hover),
+  .search-results :global(a.active) {
+    background-color: #353535;
+    opacity: 1;
+  }
+
+  .search-results :global(.search-date) {
+    font-size: 0.7rem;
+    opacity: 0.5;
+    display: block;
+    margin-top: 0.15rem;
+  }
+
+  .search-results :global(.no-results) {
+    padding: 0.6rem 0.85rem;
+    color: var(--text-desk-muted);
+    font-family: 'Fraunces', serif;
+    font-size: 0.85rem;
+  }
+
+  @media (max-width: 480px) {
+    .site-header {
+      padding: 1rem 1.25rem;
+    }
+
+    .header-left,
+    .header-right {
+      width: auto;
+    }
+
+    .site-name {
+      font-size: 0.95rem;
+    }
+
+    .search-input.expanded {
+      width: 120px;
+    }
+
+    .search-results {
+      width: 220px;
+    }
+  }
+</style>
+
+<script>
+  let searchIndex: Array<{ title: string; slug: string; date: string }> = [];
+  let activeIndex = -1;
+
+  const toggle = document.querySelector('.search-toggle');
+  const input = document.querySelector('.search-input') as HTMLInputElement;
+  const results = document.querySelector('.search-results') as HTMLElement;
+
+  async function loadIndex() {
+    if (searchIndex.length > 0) return;
+    const res = await fetch('/search-index.json');
+    searchIndex = await res.json();
+  }
+
+  function renderResults(query: string) {
+    activeIndex = -1;
+    if (!query.trim()) {
+      results.classList.remove('visible');
+      results.innerHTML = '';
+      return;
+    }
+
+    const q = query.toLowerCase();
+    const matches = searchIndex.filter((p) =>
+      p.title.toLowerCase().includes(q)
+    );
+
+    if (matches.length === 0) {
+      results.innerHTML = '<div class="no-results">No posts found</div>';
+      results.classList.add('visible');
+      return;
+    }
+
+    results.innerHTML = matches
+      .map(
+        (p) =>
+          `<a href="/posts/${p.slug}" data-slug="${p.slug}">
+            ${p.title}
+            <span class="search-date">${p.date}</span>
+          </a>`
+      )
+      .join('');
+    results.classList.add('visible');
+  }
+
+  function updateActive() {
+    const links = results.querySelectorAll('a');
+    links.forEach((l, i) => {
+      l.classList.toggle('active', i === activeIndex);
+    });
+  }
+
+  toggle?.addEventListener('click', async () => {
+    input.classList.toggle('expanded');
+    if (input.classList.contains('expanded')) {
+      input.focus();
+      await loadIndex();
+    } else {
+      results.classList.remove('visible');
+      results.innerHTML = '';
+      input.value = '';
+    }
+  });
+
+  input?.addEventListener('input', () => {
+    renderResults(input.value);
+  });
+
+  input?.addEventListener('keydown', (e) => {
+    const links = results.querySelectorAll('a');
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      activeIndex = Math.min(activeIndex + 1, links.length - 1);
+      updateActive();
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      activeIndex = Math.max(activeIndex - 1, 0);
+      updateActive();
+    } else if (e.key === 'Enter' && activeIndex >= 0 && links[activeIndex]) {
+      e.preventDefault();
+      (links[activeIndex] as HTMLAnchorElement).click();
+    } else if (e.key === 'Escape') {
+      input.value = '';
+      results.classList.remove('visible');
+      results.innerHTML = '';
+      input.classList.remove('expanded');
+      input.blur();
+    }
+  });
+
+  document.addEventListener('click', (e) => {
+    const target = e.target as HTMLElement;
+    if (!target.closest('.header-left')) {
+      results.classList.remove('visible');
+      if (!input.value) {
+        input.classList.remove('expanded');
+      }
+    }
+  });
+</script>

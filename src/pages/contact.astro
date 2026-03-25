@@ -1,0 +1,193 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="Contact">
+  <div class="paper contact-paper">
+    <h1>Get in Touch</h1>
+    <p class="contact-intro">Have a question, a thought, or just want to say hello? Send a message.</p>
+
+    <form id="contact-form" class="contact-form">
+      <div class="form-field">
+        <label for="name">Name</label>
+        <input type="text" id="name" name="name" maxlength="100" required />
+      </div>
+
+      <div class="form-field">
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" required />
+      </div>
+
+      <div class="form-field">
+        <label for="message">Message</label>
+        <textarea id="message" name="message" rows="6" maxlength="5000" required></textarea>
+      </div>
+
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAACv0cAv9pYDEG26r" data-theme="dark"></div>
+
+      <button type="submit" class="submit-btn">Send</button>
+      <div class="form-status" id="form-status"></div>
+    </form>
+  </div>
+</BaseLayout>
+
+<style>
+  .contact-paper {
+    padding-top: 2.5rem;
+    padding-bottom: 3rem;
+  }
+
+  .contact-paper h1 {
+    margin-bottom: 0.5rem;
+  }
+
+  .contact-intro {
+    opacity: 0.6;
+    margin-bottom: 2rem;
+    font-size: 0.95rem;
+  }
+
+  .contact-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .form-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+
+  .form-field label {
+    font-size: 0.85rem;
+    font-weight: 700;
+    opacity: 0.7;
+  }
+
+  .form-field input,
+  .form-field textarea {
+    font-family: 'Fraunces', serif;
+    font-size: 0.95rem;
+    background-color: var(--bg-accent-block);
+    color: var(--text-accent-block);
+    border: 1px solid transparent;
+    border-radius: 4px;
+    padding: 0.7rem 0.85rem;
+    outline: none;
+    transition: border-color 0.2s ease;
+  }
+
+  .form-field input:focus,
+  .form-field textarea:focus {
+    border-color: var(--link-color);
+  }
+
+  .form-field textarea {
+    resize: vertical;
+    line-height: 1.6;
+  }
+
+  .submit-btn {
+    font-family: 'Fraunces', serif;
+    font-size: 0.95rem;
+    font-weight: 700;
+    background-color: var(--bg-accent-block);
+    color: var(--text-accent-block);
+    border: none;
+    border-radius: 4px;
+    padding: 0.75rem 2rem;
+    cursor: pointer;
+    align-self: flex-start;
+    transition: opacity 0.2s ease;
+  }
+
+  .submit-btn:hover {
+    opacity: 0.85;
+  }
+
+  .submit-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  .form-status {
+    font-size: 0.88rem;
+    min-height: 1.5rem;
+  }
+
+  .form-status.success {
+    color: #7d8a6e;
+  }
+
+  .form-status.error {
+    color: #c47070;
+  }
+</style>
+
+<script is:inline src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+
+<script>
+  const form = document.getElementById('contact-form') as HTMLFormElement;
+  const status = document.getElementById('form-status')!;
+  const API_URL = 'https://ht-service-prd.human-thoughts.blog/contact';
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const turnstileInput = form.querySelector('[name="cf-turnstile-response"]') as HTMLInputElement | null;
+    const token = turnstileInput?.value;
+
+    if (!token) {
+      status.textContent = 'Please complete the verification.';
+      status.className = 'form-status error';
+      return;
+    }
+
+    const btn = form.querySelector('.submit-btn') as HTMLButtonElement;
+    btn.disabled = true;
+    btn.textContent = 'Sending...';
+    status.textContent = '';
+    status.className = 'form-status';
+
+    const data = {
+      name: (form.querySelector('#name') as HTMLInputElement).value,
+      email: (form.querySelector('#email') as HTMLInputElement).value,
+      message: (form.querySelector('#message') as HTMLTextAreaElement).value,
+      'cf-turnstile-response': token,
+    };
+
+    try {
+      const res = await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+
+      if (res.status === 429) {
+        throw new Error('rate-limited');
+      }
+
+      if (!res.ok) throw new Error('Failed');
+
+      status.textContent = 'Message sent. Thank you.';
+      status.className = 'form-status success';
+      form.reset();
+
+      // reset turnstile for next submission
+      if (window.turnstile) {
+        window.turnstile.reset();
+      }
+    } catch (err: any) {
+      if (err.message === 'rate-limited') {
+        status.textContent = 'Too many messages. Please wait a moment.';
+      } else {
+        status.textContent = 'Something went wrong. Please try again.';
+      }
+      status.className = 'form-status error';
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Send';
+    }
+  });
+</script>
