@@ -38,8 +38,8 @@ main {
   --color-canvas-subtle: #e8e5e0;
 
   /* Borders — warm, subtle */
-  --color-border-default: #d0cdc8;
-  --color-border-muted: #dddad5;
+  --color-border-default: #2a2522;
+  --color-border-muted: #2a2522;
 
   --color-neutral-muted: rgba(42, 37, 34, 0.08);
 
@@ -99,7 +99,8 @@ main {
 }
 
 main .gsc-comment-box {
-  border-color: #d0cdc8;
+  border-color: #2a2522;
+  border-width: 2px;
 }
 
 main .gsc-header {
@@ -112,9 +113,11 @@ main .gsc-main {
 }
 
 main .gsc-comments > .gsc-comment {
-  border-color: #d0cdc8;
+  border-color: #2a2522;
+  border-width: 2px;
 }
 
 main .gsc-timeline {
-  border-color: #d0cdc8;
+  border-color: #2a2522;
+  border-width: 2px;
 }
