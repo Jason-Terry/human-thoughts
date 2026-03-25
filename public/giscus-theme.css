@@ -100,7 +100,7 @@ main {
 
 main .gsc-comment-box {
   border-color: #2a2522;
-  border-width: 2px;
+  border-width: 5px;
 }
 
 main .gsc-header {
@@ -114,10 +114,10 @@ main .gsc-main {
 
 main .gsc-comments > .gsc-comment {
   border-color: #2a2522;
-  border-width: 2px;
+  border-width: 5px;
 }
 
 main .gsc-timeline {
   border-color: #2a2522;
-  border-width: 2px;
+  border-width: 5px;
 }
