@@ -23,7 +23,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
         <textarea id="message" name="message" rows="6" maxlength="5000" required></textarea>
       </div>
 
-      <div class="cf-turnstile" data-sitekey="0x4AAAAAACv0cAv9pYDEG26r" data-theme="dark"></div>
+      <div class="h-captcha" data-sitekey="401acafa-1434-48ac-9e30-0ec20a8e522c" data-theme="dark"></div>
 
       <button type="submit" class="submit-btn">Send</button>
       <div class="form-status" id="form-status"></div>
@@ -125,18 +125,35 @@ import BaseLayout from '../layouts/BaseLayout.astro';
   }
 </style>
 
-<script is:inline src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+<script is:inline src="https://js.hcaptcha.com/1/api.js" async defer></script>
 
 <script>
   const form = document.getElementById('contact-form') as HTMLFormElement;
   const status = document.getElementById('form-status')!;
   const API_URL = 'https://ht-service-prd.human-thoughts.blog/contact';
 
+  const isLocal = window.location.hostname === 'localhost';
+
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
 
-    const turnstileInput = form.querySelector('[name="cf-turnstile-response"]') as HTMLInputElement | null;
-    const token = turnstileInput?.value;
+    const btn = form.querySelector('.submit-btn') as HTMLButtonElement;
+
+    if (isLocal) {
+      btn.disabled = true;
+      btn.textContent = 'Sending...';
+      setTimeout(() => {
+        status.textContent = '[Local] Message simulated. Not sent.';
+        status.className = 'form-status success';
+        form.reset();
+        btn.disabled = false;
+        btn.textContent = 'Send';
+      }, 500);
+      return;
+    }
+
+    const hcaptchaInput = form.querySelector('[name="h-captcha-response"]') as HTMLInputElement | null;
+    const token = hcaptchaInput?.value;
 
     if (!token) {
       status.textContent = 'Please complete the verification.';
@@ -144,7 +161,6 @@ import BaseLayout from '../layouts/BaseLayout.astro';
       return;
     }
 
-    const btn = form.querySelector('.submit-btn') as HTMLButtonElement;
     btn.disabled = true;
     btn.textContent = 'Sending...';
     status.textContent = '';
@@ -154,7 +170,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
       name: (form.querySelector('#name') as HTMLInputElement).value,
       email: (form.querySelector('#email') as HTMLInputElement).value,
       message: (form.querySelector('#message') as HTMLTextAreaElement).value,
-      'cf-turnstile-response': token,
+      'h-captcha-response': token,
     };
 
     try {
@@ -174,9 +190,8 @@ import BaseLayout from '../layouts/BaseLayout.astro';
       status.className = 'form-status success';
       form.reset();
 
-      // reset turnstile for next submission
-      if (window.turnstile) {
-        window.turnstile.reset();
+      if (window.hcaptcha) {
+        window.hcaptcha.reset();
       }
     } catch (err: any) {
       if (err.message === 'rate-limited') {
