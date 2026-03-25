@@ -27,6 +27,24 @@ const formattedDate = date.toLocaleDateString('en-US', {
         <slot />
       </div>
       <AuthorCard />
+      <div class="giscus-wrapper">
+        <script
+          src="https://giscus.app/client.js"
+          data-repo="Jason-Terry/human-thoughts"
+          data-repo-id="R_kgDORwISEw"
+          data-category="General"
+          data-category-id="DIC_kwDORwISE84C5QL9"
+          data-mapping="pathname"
+          data-strict="0"
+          data-reactions-enabled="1"
+          data-emit-metadata="0"
+          data-input-position="bottom"
+          data-theme="https://human-thoughts.blog/giscus-theme.css"
+          data-lang="en"
+          crossorigin="anonymous"
+          async
+        ></script>
+      </div>
     </div>
   </article>
 </BaseLayout>
@@ -41,5 +59,9 @@ const formattedDate = date.toLocaleDateString('en-US', {
     opacity: 0.6;
     display: block;
     margin-bottom: 0.5rem;
+  }
+
+  .giscus-wrapper {
+    margin-top: 3rem;
   }
 </style>
