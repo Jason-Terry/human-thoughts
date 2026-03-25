@@ -80,11 +80,11 @@ main .gsc-header {
   margin-bottom: -0.5rem;
 }
 
-main .gsc-comments-count {
-  color: #e8e4de;
-  font-family: 'Fraunces', serif;
-  font-weight: 800;
-  font-size: 1rem;
+.gsc-comments-count {
+  color: #e8e4de !important;
+  font-family: 'Fraunces', serif !important;
+  font-weight: 800 !important;
+  font-size: 19px !important;
 }
 
 main .gsc-main {
