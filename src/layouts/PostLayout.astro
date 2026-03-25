@@ -14,6 +14,10 @@ const formattedDate = date.toLocaleDateString('en-US', {
   month: 'long',
   day: 'numeric',
 });
+
+const giscusTheme = import.meta.env.DEV
+  ? 'http://localhost:4321/giscus-theme.css'
+  : 'https://human-thoughts.blog/giscus-theme.css';
 ---
 
 <BaseLayout title={title}>
@@ -39,7 +43,7 @@ const formattedDate = date.toLocaleDateString('en-US', {
           data-reactions-enabled="0"
           data-emit-metadata="0"
           data-input-position="bottom"
-          data-theme="https://human-thoughts.blog/giscus-theme.css"
+          data-theme={giscusTheme}
           data-lang="en"
           crossorigin="anonymous"
           async
