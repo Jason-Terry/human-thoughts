@@ -1,3 +1,9 @@
+---
+title: "Stop Embarrassing Yourself With Bad AI Arguments"
+date: 2026-03-25
+description: "Stop Embarrassing Yourself With Bad AI Arguments."
+---
+
 # Stop Embarrassing Yourself With Bad AI Arguments
 
 ## This one's for Trevor.
