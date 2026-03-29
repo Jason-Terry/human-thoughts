@@ -140,7 +140,7 @@ If I had delegated this, the comment section would have taken way to much back-a
 ---
 
 ## What I Walked In With vs. What I Walked Out With
-
+<!-- preview -->
 I walked into this session with a markdown file and a vague idea that I wanted it on the internet. I had never touched Astro. I did not know what Giscus was. I had never configured Umami. I thought Cloudflare Turnstile would just work. I had no design beyond "dark mode, I guess."
 
 I walked out with a live blog that has a coherent design philosophy, environment-aware analytics, a captcha that actually works, comment theming that matches the site, and a contact form with real security considerations addressed. More importantly, I walked out understanding all of it. Not at an expert level. At a "I know what this does, why it is here, and what I would change next" level. The level that lets you come back in three months and keep building instead of starting over.
