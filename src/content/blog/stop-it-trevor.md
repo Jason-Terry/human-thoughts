@@ -72,6 +72,7 @@ The people making these bad arguments are not usually acting in bad faith. Many 
 
 The way the concerns get expressed is where the problem is, because when the AI ethics conversation fills up with claims that collapse under basic scrutiny, the people who might have engaged seriously disengage because the discourse seems unserious, and the people who benefit from avoiding accountability get to point at bad arguments as a reason to dismiss all arguments.
 
+<!-- preview -->
 Real accountability for AI's environmental footprint requires accurate baseline measurements, transparent corporate reporting, regional regulatory frameworks that account for water stress and grid composition, and long-term efficiency standards. None of that moves faster because someone tweeted that AI is poisoning the water table.
 
 The conversation worth having is about who controls these systems, who benefits, who bears the costs, and how you maintain decision-making accountability when the systems making consequential decisions are opaque, and those conversations require credibility, which requires accuracy, which requires doing the work before making the claim.
