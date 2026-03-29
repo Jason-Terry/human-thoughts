@@ -1,6 +1,6 @@
 ---
 title: "Stop Embarrassing Yourself With Bad AI Arguments"
-date: 2026-03-25
+date: 2026-03-29
 description: "Stop Embarrassing Yourself With Bad AI Arguments."
 ---
 
