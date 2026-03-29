@@ -4,8 +4,6 @@ date: 2026-03-29
 description: "Stop Embarrassing Yourself With Bad AI Arguments."
 ---
 
-# Stop Embarrassing Yourself With Bad AI Arguments
-
 ## This one's for Trevor.
 
 You know Trevor, maybe not by that name, but you have seen them on LinkedIn posting three times a day about AI ethics, finger-wagging at anyone who touches a generative tool, performing outrage for an audience of people who are also performing outrage.
